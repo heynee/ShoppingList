@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setOnNewItemListener() {
         shopping_list_item_add_btn.setOnClickListener {
-            val newItemName = shopping_list_item_add_et.text.toString()
+            val newItemName = shopping_list_item_add_et.text.toString().trim()
             if (newItemName.isNotBlank()) {
                 viewModel.onItemAdded(newItemName)
                 shopping_list_item_add_et.text.clear()
