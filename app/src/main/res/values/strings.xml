@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Mobi Shopping List</string>
+    <string name="add_a_shopping_list_item_hint">Add item…</string>
+    <string name="shopping_list">Shopping list</string>
 </resources>
