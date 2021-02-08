@@ -7,15 +7,14 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
 import com.silver.shopping.R
-import com.silver.shopping.model.ShoppingListItem
+import com.silver.shopping.viewmodel.MainViewModel
 
 class ShoppingListItemAdapter(
-        private var shoppingListItems: List<ShoppingListItem>,
-        private val itemActionInterface: ItemActionInterface,
+    private val viewModel: MainViewModel
 ) : RecyclerView.Adapter<ShoppingListItemAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        shoppingListItems[position].let { item ->
+        viewModel.getShoppingListItem(position)?.let { item ->
             holder.checkBox.apply {
                 this.text = item.name
                 if (item.isChecked) {
@@ -27,14 +26,10 @@ class ShoppingListItemAdapter(
                 }
             }.also {
                 it.setOnClickListener {
-                    if (item.isChecked) {
-                        itemActionInterface.unChecked(position)
-                    } else {
-                        itemActionInterface.checked(position)
-                    }
+                    viewModel.onItemChecked(position, !item.isChecked)
                 }
                 it.setOnLongClickListener {
-                    itemActionInterface.deleted(position)
+                    viewModel.onItemRemoved(position)
                     return@setOnLongClickListener true
                 }
             }
@@ -43,21 +38,15 @@ class ShoppingListItemAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view =
-                LayoutInflater.from(parent.context).inflate(R.layout.shopping_list_item, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.shopping_list_item, parent, false)
         return ViewHolder(view)
     }
 
     override fun getItemCount(): Int {
-        return shoppingListItems.size
+        return viewModel.getShoppingListSize()
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox by lazy { itemView.findViewById(R.id.shopping_list_item_check_btn) as CheckBox }
-    }
-
-    interface ItemActionInterface {
-        fun deleted(index: Int)
-        fun checked(index: Int)
-        fun unChecked(index: Int)
     }
 }
