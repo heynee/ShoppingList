@@ -5,22 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:id="@+id/shopping_list_header_ll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@color/dark_magenta"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/padding_medium"
-            android:text="@string/shopping_list"
-            android:textColor="@color/light_gray"
-            android:textSize="@dimen/text_medium" />
-    </LinearLayout>
+    <include layout="@layout/view_header" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/shopping_list_item_rv"
@@ -30,42 +15,5 @@
         android:layout_below="@id/shopping_list_header_ll"
         android:layout_alignParentStart="true" />
 
-    <LinearLayout
-        android:id="@+id/shopping_list_edit_ll"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/edit_text_height"
-        android:layout_alignParentBottom="true"
-        android:background="@color/dark_magenta"
-        android:orientation="horizontal"
-        android:padding="@dimen/padding_x_small">
-
-        <EditText
-            android:id="@+id/shopping_list_item_add_et"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_gravity="center_vertical|center_horizontal"
-            android:layout_marginEnd="@dimen/padding_small"
-            android:layout_weight="5"
-            android:background="@drawable/edit_text_box"
-            android:gravity="center|start"
-            android:hint="@string/add_a_shopping_list_item_hint"
-            android:inputType="textMultiLine|textCapSentences"
-            android:maxLines="5"
-            android:minLines="1"
-            android:paddingStart="@dimen/padding_medium"
-            android:paddingEnd="@dimen/padding_medium"
-            android:scrollHorizontally="false"
-            android:textColor="@color/light_gray"
-            android:textColorHint="@color/light_gray" />
-
-        <ImageButton
-            android:id="@+id/shopping_list_item_add_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@drawable/ic_send_white"
-            android:gravity="center"
-            android:paddingVertical="@dimen/text_medium"
-            android:paddingStart="@dimen/padding_medium"
-            android:paddingEnd="@dimen/padding_medium" />
-    </LinearLayout>
+    <include layout="@layout/view_bottom" />
 </RelativeLayout>

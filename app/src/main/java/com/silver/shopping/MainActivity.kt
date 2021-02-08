@@ -8,6 +8,7 @@ import com.silver.shopping.adapter.ShoppingListItemAdapter
 import com.silver.shopping.di.ComponentInjector
 import com.silver.shopping.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.view_bottom.*
 
 class MainActivity : AppCompatActivity() {
 
