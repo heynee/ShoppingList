@@ -6,7 +6,7 @@ import javax.inject.Singleton
 
 @Singleton
 @Component(
-    modules = [ShoppingListRepositoryModule::class]
+    modules = [ShoppingListRepositoryModule::class, WebServiceModule::class]
 )
 interface AppComponent {
     fun inject(mainViewModel: MainViewModel)

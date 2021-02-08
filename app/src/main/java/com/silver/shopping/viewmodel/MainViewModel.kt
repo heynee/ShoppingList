@@ -12,6 +12,8 @@ class MainViewModel : ViewModel() {
     @Inject
     lateinit var repository: ShoppingListRepository
 
+    var apiError = MutableLiveData<Throwable>()
+
     private var _shoppingList = MutableLiveData<MutableList<ShoppingListItem>>()
     val shoppingList = _shoppingList as LiveData<MutableList<ShoppingListItem>>
 
@@ -20,26 +22,57 @@ class MainViewModel : ViewModel() {
     }
 
     fun getShoppingList() {
-        repository.getShoppingList()
+        repository.getShoppingList(
+            {
+                _shoppingList.value = it?.map { x ->
+                    ShoppingListItem(
+                        x.value.name,
+                        x.value.isChecked,
+                        x.key
+                    )
+                } as MutableList<ShoppingListItem>
+            },
+            {
+                apiError.value = it
+            })
     }
 
     fun onItemAdded(name: String) {
         val item = ShoppingListItem(name, false)
         _shoppingList.value?.add(item)
         _shoppingList.notifyObserver()
-        repository.addItem(item)
+        repository.addItem(item,
+            {
+                item.id = it
+            },
+            {
+                //Maybe show toast "Data sync failed"
+                apiError.value = it
+            })
     }
 
     fun onItemRemoved(index: Int) {
+        val id = shoppingList.value?.get(index)?.id
         _shoppingList.value?.removeAt(index)
         _shoppingList.notifyObserver()
-        repository.removeItem("id")
+        id?.let {
+            repository.removeItem(id) {
+                //Maybe show toast "Data sync failed"
+                apiError.value = it
+            }
+        }
     }
 
     fun onItemChecked(index: Int, isChecked: Boolean) {
-        _shoppingList.value?.get(index)?.isChecked = isChecked
+        val item = shoppingList.value?.get(index)
+        item?.isChecked = isChecked
         _shoppingList.notifyObserver()
-        repository.updateCheckedStatus("id", isChecked)
+        item?.id?.let { id ->
+            repository.updateCheckedStatus(id, ShoppingListItem(item.name, item.isChecked)) {
+                //Maybe show toast "Data sync failed"
+                apiError.value = it
+            }
+        }
     }
 
     /**

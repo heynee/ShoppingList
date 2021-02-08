@@ -6,8 +6,9 @@ class ComponentInjector {
 
         fun init() {
             component = DaggerAppComponent.builder()
-                .shoppingListRepositoryModule(ShoppingListRepositoryModule())
-                .build()
+                    .webServiceModule(WebServiceModule())
+                    .shoppingListRepositoryModule(ShoppingListRepositoryModule())
+                    .build()
         }
     }
 }
