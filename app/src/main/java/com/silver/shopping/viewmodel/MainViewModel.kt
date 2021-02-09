@@ -12,72 +12,96 @@ class MainViewModel : ViewModel() {
     @Inject
     lateinit var repository: ShoppingListRepository
 
-    var apiError = MutableLiveData<Throwable>()
-
     private var _shoppingList = MutableLiveData<MutableList<ShoppingListItem>>()
     val shoppingList = _shoppingList as LiveData<MutableList<ShoppingListItem>>
+
+    private val _apiError = MutableLiveData<Action.ApiError>()
+    val apiError = _apiError as LiveData<Action.ApiError>
+
+    private val _isLoading = MutableLiveData<Action.Loading>()
+    val isLoading = _isLoading as LiveData<Action.Loading>
 
     init {
         _shoppingList.value = ArrayList()
     }
 
     fun getShoppingList() {
+        _isLoading.value = Action.Loading(true)
+
         repository.getShoppingList(
             {
-                _shoppingList.value = it?.map { x ->
-                    ShoppingListItem(
-                        x.value.name,
-                        x.value.isChecked,
-                        x.key
-                    )
-                } as MutableList<ShoppingListItem>
+                _shoppingList.value = it
+                _isLoading.value = Action.Loading(false)
             },
             {
-                apiError.value = it
+                _apiError.value = Action.ApiError
+                _isLoading.value = Action.Loading(false)
             })
     }
 
     fun onItemAdded(name: String) {
+        _isLoading.value = Action.Loading(true)
+
         val item = ShoppingListItem(name, false)
         _shoppingList.value?.add(item)
         _shoppingList.notifyObserver()
+
         repository.addItem(item,
             {
                 item.id = it
+                _isLoading.value = Action.Loading(false)
             },
             {
-                //Maybe show toast "Data sync failed"
-                apiError.value = it
+                _apiError.value = Action.ApiError
+                _isLoading.value = Action.Loading(false)
             })
     }
 
     fun onItemRemoved(index: Int) {
-        val id = shoppingList.value?.get(index)?.id
+        _isLoading.value = Action.Loading(true)
+
+        val id = _shoppingList.value?.get(index)?.id
         _shoppingList.value?.removeAt(index)
         _shoppingList.notifyObserver()
-        id?.let {
-            repository.removeItem(id) {
-                //Maybe show toast "Data sync failed"
-                apiError.value = it
-            }
+
+        if (id != null) {
+            repository.removeItem(id,
+                {
+                    _isLoading.value = Action.Loading(false)
+                },
+                {
+                    _apiError.value = Action.ApiError
+                    _isLoading.value = Action.Loading(false)
+                })
+        } else {
+            _apiError.value = Action.ApiError
+            _isLoading.value = Action.Loading(false)
         }
     }
 
     fun onItemChecked(index: Int, isChecked: Boolean) {
-        val item = shoppingList.value?.get(index)
+        _isLoading.value = Action.Loading(true)
+
+        val item = _shoppingList.value?.get(index)
         item?.isChecked = isChecked
         _shoppingList.notifyObserver()
-        item?.id?.let { id ->
-            repository.updateCheckedStatus(id, ShoppingListItem(item.name, item.isChecked)) {
-                //Maybe show toast "Data sync failed"
-                apiError.value = it
-            }
+        val id = item?.id
+
+        if (id != null) {
+            repository.updateCheckedStatus(id, ShoppingListItem(item.name, item.isChecked),
+                {
+                    _isLoading.value = Action.Loading(false)
+                },
+                {
+                    _apiError.value = Action.ApiError
+                    _isLoading.value = Action.Loading(false)
+                })
+        } else {
+            _apiError.value = Action.ApiError
+            _isLoading.value = Action.Loading(false)
         }
     }
 
-    /**
-     * Adapter callbacks
-     */
     fun getShoppingListItem(position: Int): ShoppingListItem? {
         return if (position < getShoppingListSize()) {
             _shoppingList.value?.get(position)
@@ -91,5 +115,10 @@ class MainViewModel : ViewModel() {
             return it.size
         }
         return 0
+    }
+
+    sealed class Action {
+        data class Loading(val show: Boolean) : Action()
+        object ApiError : Action()
     }
 }

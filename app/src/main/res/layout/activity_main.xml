@@ -15,5 +15,13 @@
         android:layout_below="@id/shopping_list_header_ll"
         android:layout_alignParentStart="true" />
 
+    <ProgressBar
+        android:id="@+id/loading_pb"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/progress_bar"
+        android:layout_centerInParent="true"
+        android:theme="@style/CustomProgressBarTheme"
+        android:visibility="gone" />
+
     <include layout="@layout/view_bottom" />
 </RelativeLayout>

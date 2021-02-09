@@ -1,6 +1,8 @@
 package com.silver.shopping
 
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         viewModel = createViewModel()
         adapter = ShoppingListItemAdapter(viewModel)
         applyAdapter()
-        attachObserver()
+        attachObservers()
         viewModel.getShoppingList()
         setOnNewItemListener()
     }
@@ -38,9 +40,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun attachObserver() {
+    private fun attachObservers() {
         viewModel.shoppingList.observe(this, {
             it?.let { adapter.notifyDataSetChanged() }
+        })
+
+        viewModel.apiError.observe(this, {
+            Toast.makeText(this, getString(R.string.data_sync_failed), Toast.LENGTH_SHORT).show()
+        })
+
+        viewModel.isLoading.observe(this, {
+            it?.let { showLoadingProgressBar(it.show) }
         })
     }
 
@@ -52,5 +62,9 @@ class MainActivity : AppCompatActivity() {
                 shopping_list_item_add_et.text.clear()
             }
         }
+    }
+
+    private fun showLoadingProgressBar(show: Boolean) {
+        loading_pb.visibility = if (show) View.VISIBLE else View.GONE
     }
 }

@@ -17,4 +17,11 @@
     <style name="Theme.MobiShoppingList.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.MobiShoppingList.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="CustomProgressBarTheme" parent="Widget.AppCompat.ProgressBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/dark_magenta</item>
+        <item name="colorPrimaryDark">@color/dark_magenta</item>
+        <item name="colorAccent">@color/dark_magenta</item>
+    </style>
 </resources>

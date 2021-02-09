@@ -7,11 +7,23 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class ShoppingListRepositoryImpl(private val webService: WebService) : ShoppingListRepository {
-    override fun getShoppingList(successHandler: (HashMap<String, ShoppingListItem>?) -> Unit, failureHandler: (Throwable?) -> Unit) {
+    override fun getShoppingList(
+        successHandler: (MutableList<ShoppingListItem>?) -> Unit,
+        failureHandler: (Throwable?) -> Unit
+    ) {
         webService.getShoppingList().enqueue(object : Callback<HashMap<String, ShoppingListItem>?> {
-            override fun onResponse(call: Call<HashMap<String, ShoppingListItem>?>, response: Response<HashMap<String, ShoppingListItem>?>) {
+            override fun onResponse(
+                call: Call<HashMap<String, ShoppingListItem>?>,
+                response: Response<HashMap<String, ShoppingListItem>?>
+            ) {
                 response.body()?.let {
-                    successHandler(it)
+                    successHandler(it.map { x ->
+                        ShoppingListItem(
+                            x.value.name,
+                            x.value.isChecked,
+                            x.key
+                        )
+                    } as MutableList<ShoppingListItem>)
                 }
             }
 
@@ -21,9 +33,16 @@ class ShoppingListRepositoryImpl(private val webService: WebService) : ShoppingL
         })
     }
 
-    override fun addItem(item: ShoppingListItem, successHandler: (String) -> Unit, failureHandler: (Throwable?) -> Unit) {
+    override fun addItem(
+        item: ShoppingListItem,
+        successHandler: (String) -> Unit,
+        failureHandler: (Throwable?) -> Unit
+    ) {
         webService.addItem(item).enqueue(object : Callback<ShoppingListItem> {
-            override fun onResponse(call: Call<ShoppingListItem>, response: Response<ShoppingListItem>) {
+            override fun onResponse(
+                call: Call<ShoppingListItem>,
+                response: Response<ShoppingListItem>
+            ) {
                 response.body()?.let {
                     successHandler(it.name)
                 }
@@ -35,9 +54,14 @@ class ShoppingListRepositoryImpl(private val webService: WebService) : ShoppingL
         })
     }
 
-    override fun removeItem(id: String, failureHandler: (Throwable?) -> Unit) {
+    override fun removeItem(
+        id: String,
+        successHandler: () -> Unit,
+        failureHandler: (Throwable?) -> Unit
+    ) {
         webService.removeItem(id).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                successHandler()
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable?) {
@@ -46,9 +70,18 @@ class ShoppingListRepositoryImpl(private val webService: WebService) : ShoppingL
         })
     }
 
-    override fun updateCheckedStatus(id: String, item: ShoppingListItem, failureHandler: (Throwable?) -> Unit) {
+    override fun updateCheckedStatus(
+        id: String,
+        item: ShoppingListItem,
+        successHandler: () -> Unit,
+        failureHandler: (Throwable?) -> Unit
+    ) {
         webService.updateCheckedStatus(id, item).enqueue(object : Callback<ShoppingListItem> {
-            override fun onResponse(call: Call<ShoppingListItem>, response: Response<ShoppingListItem>) {
+            override fun onResponse(
+                call: Call<ShoppingListItem>,
+                response: Response<ShoppingListItem>
+            ) {
+                successHandler()
             }
 
             override fun onFailure(call: Call<ShoppingListItem>, t: Throwable?) {
