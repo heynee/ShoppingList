@@ -32,7 +32,6 @@ class ShoppingListUnitTests {
     )
 
     private val shoppingListObserver: Observer<List<ShoppingListItem>> = mock()
-    private val apiErrorObserver: Observer<MainViewModel.Action.ApiError> = mock()
     private val loadingObserver: Observer<MainViewModel.Action.Loading> = mock()
 
     @Before
@@ -74,7 +73,6 @@ class ShoppingListUnitTests {
             }
 
             shoppingList.observeForever(shoppingListObserver)
-            apiError.observeForever(apiErrorObserver)
             isLoading.observeForever(loadingObserver)
         }
     }
